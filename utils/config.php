@@ -2,7 +2,7 @@
 $server="localhost";
 $username="root";
 $password="";
-$db="id9483218_tuitionmanager";
+$db="attendance_recorder";
 $con=mysqli_connect($server,$username,$password,$db);
 
 // Check connection
