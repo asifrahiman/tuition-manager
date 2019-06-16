@@ -2,7 +2,7 @@
 	require '../../utils/config.php';
 	switch ($_GET['action']) {
 		case "add":
-			$Batch=$_POST["Batch"];
+			$Batch=$_GET["Batch"];
 			if (!mysqli_query($con,"INSERT INTO batches (Batch)VALUES ('$Batch')"))
 			{
 			echo("Error description: " . mysqli_error($con));
