@@ -5,7 +5,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 	$scope.editindex=-1;
 	$http({
 		method: 'GET',
-		url: 'get.php'
+		url: 'utils/batch.php?action=get'
 	}).then(function (success){
 		var _len = success.data.length;
 		var  post, i;
@@ -18,39 +18,32 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 		alert(error);
 	});
 	$scope.addItem = function () {
-		if (!$scope.addbatch){alert("Please fill all the details");return;} 
+		var Batch=$scope.addbatch;
+		if (!Batch){alert("Please fill all the details");return;} 
 		if($scope.editindex==-1){
-			var dataString = 'Batch='+ $scope.addbatch;
-			nitem={'Batch':$scope.addbatch};
-			$scope.batches.push(nitem);
-			$.ajax({
-				type: "POST",
-				url: "add.php",
-				data: dataString,
-				cache: false,
-				success: function(result){
-					$scope.batches[$scope.batches.indexOf(nitem)].BatchId=parseInt(result);
-				},
-				error: function(request,status,errorThrown) {
-					alert("error occured:"+errorThrown);
-				}
+			var dataString = '&Batch='+ Batch;
+			$http({
+				method: 'GET',
+				url: "utils/batch.php?action=add"+dataString
+			}).then(function (result){
+				BatchId=parseInt(result);
+				nitem={'Batch':Batch,'BatchId':BatchId};
+				$scope.batches.push(nitem);
+			},function (error){
+				alert(error);
 			});
 		}
 		else
 		{
-			var dataString = 'Batch='+ $scope.addbatch + '&BatchId='+ $scope.batches[$scope.editindex].BatchId;
-			$scope.batches[$scope.editindex].Batch=$scope.addbatch;
-			$.ajax({
-				type: "POST",
-				url: "update.php",
-				data: dataString,
-				cache: false,
-				success: function(result){
-					
-				},
-				error: function(request,status,errorThrown) {
-					alert("error occured:"+errorThrown);
-				}
+			var editindex=$scope.editindex
+			var dataString = '&Batch='+ Batch + '&BatchId='+ $scope.batches[editindex].BatchId;
+			$http({
+				method: 'GET',
+				url: "utils/batch.php?action=update"+dataString
+			}).then(function (result){
+				$scope.batches[editindex].Batch=Batch;
+			},function (error){
+				alert(error);
 			});
 		}
 		$scope.addbatch="";
@@ -59,19 +52,14 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 	$scope.removeItem = function (x) {
 		var index = $scope.batches.indexOf(x);
 		if (index != -1) {
-			var datastring = 'BatchId='+ $scope.batches[index].BatchId;
-			$scope.batches.splice(index, 1);
-			$.ajax({
-				type: "POST",
-				url: "remove.php",
-				data: datastring,
-				cache: false,
-				success: function(result){
-					
-				},
-				error: function(request,status,errorThrown) {
-					alert("error occured");
-				}
+			var dataString = '&BatchId='+ $scope.batches[index].BatchId;
+			$http({
+				method: 'GET',
+				url: "utils/batch.php?action=remove"+dataString
+			}).then(function (result){
+				$scope.batches.splice(index, 1);
+			},function (error){
+				alert(error);
 			});
 		}
     }
