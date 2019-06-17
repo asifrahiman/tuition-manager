@@ -19,7 +19,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 	$scope.adddate=today;
 	$http({
 		method: 'GET',
-		url: '../student/get.php'
+		url: '../../student/util/student.php?action=get'
 	}).then(function (success){
 		var _len = success.data.length;
 		var  post, i;
@@ -33,7 +33,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 	});
 	$http({
 		method: 'GET',
-		url: '../batch/get.php'
+		url: '../../batch/util/batch.php?action=get'
 	}).then(function (success){
 		var _len = success.data.length;
 		var  post, i;
@@ -47,7 +47,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 	});
 	$http({
 		method: 'GET',
-		url: 'get.php'
+		url: 'util/session.php?action=get'
 	}).then(function (success){
 		var _len = success.data.length;
 		var  post, i;
@@ -72,8 +72,8 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 			nitem={'BatchId':$scope.addbatch,'Name':$scope.addname,'Batch':Batch};
 			$scope.students.push(nitem);
 			$.ajax({
-				type: "POST",
-				url: "add.php",
+				type: "GET",
+				url: "util/session.php?action=add"+dataString,
 				data: dataString,
 				cache: false,
 				success: function(result){
@@ -91,8 +91,8 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 			$scope.students[$scope.editindex].BatchId=$scope.addbatch;
 			$scope.students[$scope.editindex].Batch=Batch;
 			$.ajax({
-				type: "POST",
-				url: "update.php",
+				type: "GET",
+				url: "util/session.php?action=update"+dataString,
 				data: dataString,
 				cache: false,
 				success: function(result){
@@ -113,8 +113,8 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 			var datastring = 'StudentId='+ $scope.students[index].StudentId;
 			$scope.students.splice(index, 1);
 			$.ajax({
-				type: "POST",
-				url: "remove.php",
+				type: "GET",
+				url: "util/session.php?action=remove"+dataString,
 				data: datastring,
 				cache: false,
 				success: function(result){
