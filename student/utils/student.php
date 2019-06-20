@@ -39,8 +39,8 @@
 						break;
 						
 		case "remove":
-						$BatchId=$_GET['BatchId'];
-						if (!mysqli_query($con,"DELETE FROM `batches` WHERE `BatchId` = $BatchId"))
+						$StudentId=$_GET["StudentId"];
+						if (!mysqli_query($con,"DELETE FROM `students` WHERE `StudentId` = $StudentId"))
 						{
 							echo("Error description: " . mysqli_error($con));
 							header("HTTP/1.0 500 Internal Server Error");
@@ -53,17 +53,9 @@
 						break;
 						
 		default:
-					$StudentId=$_GET['StudentId'];
-					if (!mysqli_query($con,"DELETE FROM `students` WHERE `StudentId` = $StudentId"))
-					 {
-						 echo("Error description: " . mysqli_error($con));
+					echo "An error occured";
 							 header("HTTP/1.0 500 Internal Server Error");
 							 die;
 					 }
-					 else
-					 {
-						 echo("success");
-					 }
-	}
 	mysqli_close($con);
 ?>

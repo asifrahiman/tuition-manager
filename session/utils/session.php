@@ -5,7 +5,7 @@
 		case "add":
 			$BatchId=$_GET["BatchId"];
 			$Name=$_GET["Name"];
-			if (!mysqli_query($con,"INSERT INTO sessions (BatchId , Name)VALUES ('$BatchId','$Name')"))
+			if (!mysqli_query($con,"INSERT INTO sessions (SessionId , Name)VALUES ('$BatchId','$Name')"))
 			 {
 				 echo("Error description: " . mysqli_error($con));
 					 header("HTTP/1.0 500 Internal Server Error");

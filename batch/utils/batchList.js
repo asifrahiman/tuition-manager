@@ -26,7 +26,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 				method: 'GET',
 				url: "utils/batch.php?action=add"+dataString
 			}).then(function (result){
-				BatchId=parseInt(result);
+				BatchId=parseInt(result.data);
 				nitem={'Batch':Batch,'BatchId':BatchId};
 				$scope.batches.push(nitem);
 			},function (error){
@@ -35,7 +35,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 		}
 		else
 		{
-			var editindex=$scope.editindex
+			var editindex=$scope.editindex;
 			var dataString = '&Batch='+ Batch + '&BatchId='+ $scope.batches[editindex].BatchId;
 			$http({
 				method: 'GET',
