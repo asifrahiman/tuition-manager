@@ -19,7 +19,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 	$scope.adddate=today;
 	$http({
 		method: 'GET',
-		url: '../student/get.php'
+		url: '../student/utils/student.php?action=get'
 	}).then(function (success){
 		var _len = success.data.length;
 		var  post, i;
@@ -33,7 +33,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 	});
 	$http({
 		method: 'GET',
-		url: '../batch/get.php'
+		url: '../batch/utils/batch.php?action=get'
 	}).then(function (success){
 		var _len = success.data.length;
 		var  post, i;
@@ -47,7 +47,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 	});
 	$http({
 		method: 'GET',
-		url: 'get.php'
+		url: 'utils/session.php?action=get'
 	}).then(function (success){
 		var _len = success.data.length;
 		var  post, i;
@@ -61,68 +61,58 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 	});
 	$scope.addItem = function () {
 		var Batch;
-		if (!$scope.addbatch||!$scope.addname){alert("Please fill all the details");return;} 
+		var BatchId = $scope.addbatch;
+		let SessionName = $scope.addname;
+		if (!BatchId||!SessionName){alert("Please fill all the details");return;} 
 		angular.forEach($scope.sessions, function(item) {
-			if( item.BatchId.indexOf($scope.addbatch)==0){
+			if( item.BatchId.indexOf(BatchId)==0){
 				Batch=item.Batch;
 			}
 		});
 		if($scope.editindex==-1){
-			var dataString = 'BatchId='+ $scope.addbatch + '&Name='+ $scope.addname;
-			nitem={'BatchId':$scope.addbatch,'Name':$scope.addname,'Batch':Batch};
-			$scope.students.push(nitem);
-			$.ajax({
-				type: "POST",
-				url: "add.php",
-				data: dataString,
-				cache: false,
-				success: function(result){
-					$scope.students[$scope.students.indexOf(nitem)].StudentId=parseInt(result);
-				},
-				error: function(request,status,errorThrown) {
-					alert("error occured:"+errorThrown);
-				}
+			var dataString = '&BatchId='+ BatchId + '&Name='+ SessionName;
+			$http({
+				type: "GET",
+				url: "util/session.php?action=add"+dataString
+			}).then(function(result){
+				BatchId=parseInt(result.data);
+				nitem={'BatchId':BatchId,'Name':SessionName,'Batch':Batch, 'SessionId':SessionId};
+				$scope.sessions.push(nitem);
+			},function (error){
+				alert(error);
 			});
 		}
 		else
 		{
-			var dataString = 'BatchId='+ $scope.addbatch + '&Name='+ $scope.addname + '&StudentId='+ $scope.students[$scope.editindex].StudentId;
-			$scope.students[$scope.editindex].Name=$scope.addname;
-			$scope.students[$scope.editindex].BatchId=$scope.addbatch;
-			$scope.students[$scope.editindex].Batch=Batch;
-			$.ajax({
-				type: "POST",
-				url: "update.php",
-				data: dataString,
-				cache: false,
-				success: function(result){
-					
-				},
-				error: function(request,status,errorThrown) {
-					alert("error occured:"+errorThrown);
-				}
-			});
+			var editindex=$scope.editindex;
+			var dataString = '&BatchId='+ BatchId + '&Name='+ SessionName + '&SessionId='+ $scope.sessions[editindex].SessionId;
+			$http({
+				type: "GET",
+				url: "util/session.php?action=update"+dataString
+			}).then(function(result){
+				$scope.students[editindex].Name=SessionName;
+				$scope.students[editindex].BatchId=$BatchId;
+				$scope.students[editindex].Batch=Batch;
+				},function (error){
+					alert(error);
+				});
 		}
 		$scope.addbatch="";
 		$scope.addname="";
 		$scope.editindex=-1;
 	}
 	$scope.removeItem = function (x) {
-		var index = $scope.students.indexOf(x);
+		var index = $scope.sessions.indexOf(x);
 		if (index != -1) {
-			var datastring = 'StudentId='+ $scope.students[index].StudentId;
-			$scope.students.splice(index, 1);
-			$.ajax({
-				type: "POST",
-				url: "remove.php",
-				data: datastring,
-				cache: false,
-				success: function(result){
-					
-				},
-				error: function(request,status,errorThrown) {
-					alert("error occured");
-				}
+			var dataString = '&SessionId='+ $scope.sessions[index].SessionId;			
+			$http({
+				type: "GET",
+				url: "util/session.php?action=remove"+dataString
+			}).then(function(result){
+				$scope.sessions.splice(index, 1);
+			},
+			function (error){
+				alert(error);
 			});
 		}
     }

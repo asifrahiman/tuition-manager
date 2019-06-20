@@ -12,6 +12,7 @@
 			$dbid=mysqli_insert_id($con);
 			echo $dbid;
 			break;
+		
 		case "get":
 			$sel = mysqli_query($con,"SELECT * FROM `batches`");
 			$data = array();
@@ -20,6 +21,7 @@
 			}
 			echo json_encode($data);
 			break;
+		
 		case "update":
 			$Batch=$_GET["Batch"]; 
 			$BatchId=$_GET['BatchId'];
@@ -34,6 +36,7 @@
 				echo("success");
 			}
 			break;
+		
 		case "remove":
 			$BatchId=$_GET['BatchId'];
 			if (!mysqli_query($con,"DELETE FROM `batches` WHERE `BatchId` = $BatchId"))
@@ -47,6 +50,7 @@
 				echo("success");
 			}
 			break;
+		
 		default:
 			echo "An error occured";
 			header("HTTP/1.0 500 Internal Server Error");

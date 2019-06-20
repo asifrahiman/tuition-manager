@@ -5,7 +5,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 	$scope.editindex=-1;
 	$http({
 		method: 'GET',
-		url: 'get.php'
+		url: 'utils/student.php?action=get'
 	}).then(function (success){
 		var _len = success.data.length;
 		var  post, i;
@@ -19,7 +19,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 	});
 	$http({
 		method: 'GET',
-		url: '../batch/get.php'
+		url: '../batch/utils/batch.php?action=get'
 	}).then(function (success){
 		var _len = success.data.length;
 		var  post, i;
@@ -33,46 +33,41 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 	});
 	$scope.addItem = function () {
 		var Batch;
-		if (!$scope.addbatch||!$scope.addname){alert("Please fill all the details");return;} 
+		var Studentname = $scope.addname;
+		var BatchId = $scope.addbatch;
+		if (!BatchId||!Studentname){alert("Please fill all the details");return;} 
 		angular.forEach($scope.batches, function(item) {
-			if( item.BatchId.indexOf($scope.addbatch)==0){
+			if( item.BatchId.indexOf(BatchId)==0){
 				Batch=item.Batch;
 			}
 		});
 		if($scope.editindex==-1){
-			var dataString = 'BatchId='+ $scope.addbatch + '&Name='+ $scope.addname;
-			nitem={'BatchId':$scope.addbatch,'Name':$scope.addname,'Batch':Batch};
-			$scope.students.push(nitem);
-			$.ajax({
-				type: "POST",
-				url: "add.php",
-				data: dataString,
-				cache: false,
-				success: function(result){
-					$scope.students[$scope.students.indexOf(nitem)].StudentId=parseInt(result);
-				},
-				error: function(request,status,errorThrown) {
-					alert("error occured:"+errorThrown);
-				}
+			var dataString = '&BatchId='+ BatchId + '&Name='+ Studentname;
+			$http({
+				method: 'GET',
+				url: "utils/student.php?action=add"+dataString
+			}).then(function(result){
+				StudentId=parseInt(result.data);
+				nitem={'BatchId':BatchId,'Name':Studentname,'Batch':Batch, 'StudentId':StudentId};
+				$scope.students.push(nitem);
+			},function (error){
+				alert(error);
 			});
 		}
 		else
 		{
-			var dataString = 'BatchId='+ $scope.addbatch + '&Name='+ $scope.addname + '&StudentId='+ $scope.students[$scope.editindex].StudentId;
-			$scope.students[$scope.editindex].Name=$scope.addname;
-			$scope.students[$scope.editindex].BatchId=$scope.addbatch;
-			$scope.students[$scope.editindex].Batch=Batch;
-			$.ajax({
-				type: "POST",
-				url: "update.php",
-				data: dataString,
-				cache: false,
-				success: function(result){
-					
-				},
-				error: function(request,status,errorThrown) {
-					alert("error occured:"+errorThrown);
-				}
+			var editindex=$scope.editindex;
+			var dataString = '&BatchId='+ BatchId + '&Name='+ Studentname + '&StudentId='+ $scope.students[editindex].StudentId;
+			
+			$http({
+				method: 'GET',
+				url: "utils/student.php?action=update"+dataString
+			}).then(function(result){
+				$scope.students[editindex].Name=Studentname;
+				$scope.students[editindex].BatchId=BatchId;
+				$scope.students[editindex].Batch=Batch;
+			}, function(error){
+				alert(error);
 			});
 		}
 		$scope.addbatch="";
@@ -82,19 +77,14 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 	$scope.removeItem = function (x) {
 		var index = $scope.students.indexOf(x);
 		if (index != -1) {
-			var datastring = 'StudentId='+ $scope.students[index].StudentId;
-			$scope.students.splice(index, 1);
-			$.ajax({
-				type: "POST",
-				url: "remove.php",
-				data: datastring,
-				cache: false,
-				success: function(result){
-					
-				},
-				error: function(request,status,errorThrown) {
-					alert("error occured");
-				}
+			var dataString = '&StudentId='+ $scope.students[index].StudentId;
+			$http({
+				method: 'GET',
+				url: "utils/student.php?action=remove"+dataString
+			}).then (function (result){
+					$scope.students.splice(index, 1);
+				},function (error){
+				alert(error);
 			});
 		}
     }
