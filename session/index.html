@@ -120,8 +120,8 @@
 				<div class="modal-body">
 					<form class="d-sm-inline-block form-inline mr-auto my-2 mw-100 navbar-search">
 						<div class="input-group">
-						  <input type="text" class="form-control border-0 small" placeholder="Enter Name" ng-model="addname" aria-label="Search" aria-describedby="basic-addon2">
-						  <input type="text" id="sessiondate" ng-model="adddate" class="form-control border-0 small" placeholder="Select date"/>
+						  <input type="text" class="form-control bg-light small" placeholder="Enter Name" ng-model="addname" aria-label="Search" aria-describedby="basic-addon2">
+						  <input type="text" id="sessiondate" ng-model="adddate" class="form-control bg-light small" placeholder="Select date"/>
 						</div>
 					</form>
 					
@@ -129,7 +129,19 @@
 						<div class="card-header py-3">
 						  <h6 class="m-0 font-weight-bold text-primary">Add Attendance</h6>
 						</div>
+						
 						<div class="card-body">
+							<form  class="d-sm-inline-block form-inline mr-auto my-2  mw-100 navbar-search">
+								<div class="input-group">
+								  <select ng-change="checkVal()" id = "TypeSelect" class="form-control small" ng-model="addbatch" aria-label="Search" aria-describedby="basic-addon2">
+									<option value="">Batch</option>
+									<option ng-repeat="x in batches|orderBy:'Batch'" value="{{x.BatchId}}">{{x.Batch}}</option>
+								  </select>
+								  <div class="input-group-append">
+									<button ng-click="addBatchAttendance()"  class="btn btn-primary" type="button">Add</button>
+								  </div>
+								</div>
+							</form>
 							<div class="table-responsive">
 								<table class="table table-bordered" width="100%" cellspacing="0">
 									<thead>
@@ -144,21 +156,12 @@
 									</tbody>
 								</table>
 							</div>
+							<span ng-click="ShowHide()" class="btn btn-secondary">Add Others</span>
 						</div>
+						
 					</div>
-					<form  class="d-sm-inline-block form-inline mr-auto my-2  mw-100 navbar-search">
-						<div class="input-group">
-						  <select ng-change="checkVal()" id = "TypeSelect" class="form-control small" ng-model="addbatch" aria-label="Search" aria-describedby="basic-addon2">
-							<option value="">Batch</option>
-							<option ng-repeat="x in batches|orderBy:'Batch'" value="{{x.BatchId}}">{{x.Batch}}</option>
-						  </select>
-						  <div class="input-group-append">
-							<button ng-click="addBatchAttendance()"  class="btn btn-primary" type="button">Add</button>
-						  </div>
-						</div>
-					</form>
 					<div>
-						<span ng-click="ShowHide()" class="btn btn-success">Add Others</span>
+						
 						<div ng-show = "IsVisible">
 							<div class="card shadow mb-4">
 								<div class="card-header py-3">
@@ -201,7 +204,8 @@
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-success" >Add Session</button>
+					<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
 				</div>
 			</div>
 		</div>
