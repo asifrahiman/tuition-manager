@@ -17,8 +17,9 @@
 	<script src="../utils/bootstrap.min.js"></script>  
 	<script src="../utils/bootstrap-datepicker.js"></script> 
 	<script src="../utils/angular.min.js"></script>
+	<script src="utils/sessionList.js"></script>
+  <script src="../utils/dirPagination.js"></script>
 </head>
-<script src="utils/sessionList.js"></script>
 
 <body ng-app="Sessionlist" ng-controller="myCtrl">
 	<div class="header1">

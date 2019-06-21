@@ -15,7 +15,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 			$scope.batches.push({'Batch':post.Batch,'BatchId':post.BatchId});
 		}
 	},function (error){
-		alert(error);
+		alert(error.data);
 	});
 	$scope.addItem = function () {
 		var Batch=$scope.addbatch;
@@ -30,7 +30,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 				nitem={'Batch':Batch,'BatchId':BatchId};
 				$scope.batches.push(nitem);
 			},function (error){
-				alert(error);
+				alert(error.data);
 			});
 		}
 		else
@@ -43,7 +43,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 			}).then(function (result){
 				$scope.batches[editindex].Batch=Batch;
 			},function (error){
-				alert(error);
+				alert(error.data);
 			});
 		}
 		$scope.addbatch="";
@@ -59,7 +59,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 			}).then(function (result){
 				$scope.batches.splice(index, 1);
 			},function (error){
-				alert(error);
+				alert(error.data);
 			});
 		}
     }

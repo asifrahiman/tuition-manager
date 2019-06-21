@@ -1,4 +1,4 @@
-var app = angular.module("Sessionlist", []); 
+var app = angular.module("Sessionlist", ['angularUtils.directives.dirPagination']); 
 app.controller("myCtrl", function($scope, $filter,$http) {
 	$scope.students = [];
 	$scope.sessions = [];
@@ -135,16 +135,28 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 	}
 	$scope.addBatchAttendance = function(){
 		angular.forEach($scope.students, function(item) {
-			if( item.BatchId.indexOf($scope.addbatch)==0){
-				$scope.attendees.push(item);
-			}
+			if($scope.attendees.indexOf(item)==-1)
+				if( item.BatchId==$scope.addbatch){
+						$scope.attendees.push(item);
+					}
+				
+		});
+		angular.forEach($scope.attendees, function(item) {
+			var index = $scope.students.indexOf(item);
+			console.log(index)
+			if(index>-1)
+			$scope.students.splice(index, 1);
 		});
 	}
 	$scope.addToAttendees = function(x){
+		var index = $scope.students.indexOf(x);
+		$scope.students.splice(index, 1);
 		$scope.attendees.push(x);
 	}
 	$scope.removeAttendance = function(x){
 		var index = $scope.attendees.indexOf(x);
 		$scope.attendees.splice(index, 1);
+		$scope.students.push(x);
+		
 	}
 });	

@@ -1,4 +1,4 @@
-var app = angular.module("studentlist", []); 
+var app = angular.module("studentlist", ['angularUtils.directives.dirPagination']); 
 app.controller("myCtrl", function($scope, $filter,$http) {
 	$scope.students = [];
 	$scope.batches = [];
@@ -15,7 +15,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 			$scope.students.push({'StudentId':post.StudentId,'BatchId':post.BatchId,'Batch':post.Batch,'Name':post.Name});
 		}
 	},function (error){
-		alert(error);
+		alert(error.data);
 	});
 	$http({
 		method: 'GET',
@@ -29,7 +29,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 			$scope.batches.push({'BatchId':post.BatchId,'Batch':post.Batch});
 		}
 	},function (error){
-		alert(error);
+		alert(error.data);
 	});
 	$scope.addItem = function () {
 		var Batch;
@@ -51,7 +51,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 				nitem={'BatchId':BatchId,'Name':Studentname,'Batch':Batch, 'StudentId':StudentId};
 				$scope.students.push(nitem);
 			},function (error){
-				alert(error);
+				alert(error.data);
 			});
 		}
 		else
@@ -67,7 +67,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 				$scope.students[editindex].BatchId=BatchId;
 				$scope.students[editindex].Batch=Batch;
 			}, function(error){
-				alert(error);
+				alert(error.data);
 			});
 		}
 		$scope.addbatch="";
@@ -84,7 +84,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 			}).then (function (result){
 					$scope.students.splice(index, 1);
 				},function (error){
-				alert(error);
+				alert(error.data);
 			});
 		}
     }
@@ -93,5 +93,9 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 		$scope.addbatch=$scope.students[index].BatchId;
 		$scope.addname=$scope.students[index].Name;
 		$scope.editindex=index;
+    }
+	$scope.getStudentDetails = function (x) {
+		$scope.StudentDetailId=x.StudentId;
+		$scope.StudentDetailName=x.Name;
     }
 });	
