@@ -71,7 +71,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 	$scope.getStudentDetails = function (BatchId) {
 		$http({
 			method: 'GET',
-			url: '../student/get.php'
+			url: '../student/utils/student.php?action=get'
 		}).then(function (success){
 			$scope.studentDetails=[];
 			var _len = success.data.length;
@@ -83,7 +83,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 					$scope.studentDetails.push({'Name':post.Name,'StudentId':post.StudentId});
 			}
 		},function (error){
-			alert(error);
+			alert(error.data);
 		});
 	}
 });	
