@@ -77,13 +77,13 @@
                 <table class="table table-bordered" width="100%" cellspacing="0">
                   <thead>
                     <tr>
-                      <th>Name</th>
+                      <th>SessionName</th>
                       <th>Date</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr ng-repeat="x in sessions| orderBy:['Name']| filter : sessionfilter"><td>  {{x.Name}} </td><td> {{x.Date}} </td><td><span>view</span> | <span ng-click="editItem(x)">edit</span> | <span ng-click="removeItem(x)">clear</span></td></tr>
+                    <tr ng-repeat="x in sessions| orderBy:['Date']| filter : sessionfilter"><td>  {{x.SessionName}} </td><td> {{x.Date}} </td><td><span data-toggle="modal" data-target="#ViewSession" ng-click="getsession(x)">view</span> | <span ng-click="editItem(x)">edit</span> | <span ng-click="removeItem(x)">clear</span></td></tr>
                   </tbody>
                 </table>
               </div>
@@ -146,7 +146,7 @@
 								<table class="table table-bordered" width="100%" cellspacing="0">
 									<thead>
 										<tr>
-										<th>S.Id</th>
+										<th>Student Id</th>
 										<th>Name</th>
 										<th>Action</th>
 										</tr>
@@ -204,7 +204,51 @@
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-success" >Add Session</button>
+					<button type="button" class="btn btn-success" ng-click="addSession()">Add Session</button>
+					<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="ViewSession" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog" style="width:90%;max-width:90%" role="document">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Session Details</h5>
+					<button class="close" type="button" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+					
+				</div>
+				<div class="modal-body">
+					<p>Session Name : {{SessionDetailName}}</p>
+					<p>date : {{SessionDetailDate}}</p>
+					<div class="card shadow mb-4">
+						<div class="card-header py-3">
+						  <h6 class="m-0 font-weight-bold text-primary">Attendees</h6>
+						</div>
+						
+						<div class="card-body">
+							<div class="table-responsive">
+								<table class="table table-bordered" width="100%" cellspacing="0">
+									<thead>
+										<tr>
+										<th>Student Id</th>
+										<th>Name</th>
+										<th>Batch</th>
+										<th>Action</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr ng-repeat="x in sessionattendees| orderBy:['Name']" ><td>  {{x.StudentId}} </td><td>  {{x.Name}} </td><td>  {{x.Batch}} </td><td><span ng-click="removeStudentAttendance(x)">Remove</span></td></tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
 					<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
 				</div>
 			</div>

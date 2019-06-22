@@ -155,13 +155,13 @@
 								<table class="table table-bordered" width="100%" cellspacing="0">
 									<thead>
 										<tr>
-										<th>Session</th>
+										<th>Session Name</th>
 										<th>Date</th>
 										<th>Action</th>
 										</tr>
 									</thead>
 									<tbody>
-										<tr ng-repeat="x in studentSessions| orderBy:['Date']" ><td>  {{x.Name}} </td><td>  {{x.Date}} </td><td>  <span ng-click="removeStudentAttendance(x)">Remove Attendance</span> </td></tr>
+										<tr ng-repeat="x in studentSessions| orderBy:['Date']" ><td>  {{x.SessionName}} </td><td>  {{x.Date}} </td><td>  <span ng-click="removeStudentAttendance(x)">Remove Attendance</span> </td></tr>
 									</tbody>
 								</table>
 							</div>

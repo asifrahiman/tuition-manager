@@ -3,24 +3,27 @@
 	switch ($_GET['action']) {
 		
 		case "add":
-			$BatchId=$_GET["BatchId"];
-			$Name=$_GET["Name"];
-			if (!mysqli_query($con,"INSERT INTO sessions (SessionId , Name)VALUES ('$BatchId','$Name')"))
-			 {
-				 echo("Error description: " . mysqli_error($con));
-					 header("HTTP/1.0 500 Internal Server Error");
-					 die;
-			 }
-			 $dbid=mysqli_insert_id($con);
-
-			 echo $dbid;
+			$date=$_GET["date"];
+			$SessionName=$_GET["SessionName"];
+			$Attendees=json_decode($_GET["Attendees"], true);
+			if (!mysqli_query($con,"INSERT INTO sessions (SessionName , Date)VALUES ('$SessionName','$date')"))
+			{
+				echo("Error description: " . mysqli_error($con));
+				header("HTTP/1.0 500 Internal Server Error");
+				die;
+			}
+			$SessionId=mysqli_insert_id($con);
+			foreach ($Attendees as $Attendee){
+				mysqli_query($con,"INSERT INTO attendance (SessionId , StudentId)VALUES ('$SessionId','$Attendee')");
+			} 
+			echo $SessionId;
 			break;
 		
 		case "get":
 			$sel = mysqli_query($con,"SELECT * FROM `sessions`");
 			$data = array();
 			while ($row = mysqli_fetch_array($sel)) {
-				$data[] = array("SessionId"=>$row['SessionId'],"Name"=>$row['Name'],"Date"=>$row['Date']);
+				$data[] = array("SessionId"=>$row['SessionId'],"SessionName"=>$row['SessionName'],"date"=>$row['Date']);
 			}
 			echo json_encode($data);
 			break;
@@ -39,8 +42,25 @@
 			break;
 		
 		case "remove":
+			$SessionId=$_GET['SessionId'];
+			mysqli_query($con,"DELETE FROM `sessions` WHERE `SessionId` = $SessionId");
+			mysqli_query($con,"DELETE FROM attendance WHERE `SessionId` =  $SessionId");
+			break;
+		
+		case "getSessionAttendees":
+			$SessionId=$_GET['SessionId'];
+			$sel = mysqli_query($con,"SELECT *,batches.Batch as Batch FROM `students` , `batches` where students.BatchId=batches.BatchId and `StudentId` in (select `StudentId` from attendance where SessionId=$SessionId) ");
+			$data = array();
+			while ($row = mysqli_fetch_array($sel)) {
+				$data[] = array("BatchId"=>$row['BatchId'],"StudentId"=>$row['StudentId'],"Name"=>$row['Name'],"Batch"=>$row['Batch']);
+			}
+			echo json_encode($data);
+			break;
+		
+		case "removeStudentAttendance":
+			$SessionId=$_GET['SessionId'];
 			$StudentId=$_GET['StudentId'];
-			if (!mysqli_query($con,"DELETE FROM `sessions` WHERE `StudentId` = $StudentId"))
+			if (!mysqli_query($con,"DELETE FROM attendance where SessionId=$SessionId and `StudentId` = $StudentId"))
 			 {
 				 echo("Error description: " . mysqli_error($con));
 					 header("HTTP/1.0 500 Internal Server Error");

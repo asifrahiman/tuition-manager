@@ -4,6 +4,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 	$scope.sessions = [];
 	$scope.batches = [];
 	$scope.attendees = [];
+	$scope.sessionattendees = [];
 	$scope.editindex=-1;
 	var today = new Date();
 	var dd = today.getDate();
@@ -29,7 +30,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 			$scope.students.push({'StudentId':post.StudentId,'BatchId':post.BatchId,'Batch':post.Batch,'Name':post.Name});
 		}
 	},function (error){
-		alert(error);
+		alert(error.data);
 	});
 	$http({
 		method: 'GET',
@@ -43,7 +44,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 			$scope.batches.push({'BatchId':post.BatchId,'Batch':post.Batch});
 		}
 	},function (error){
-		alert(error);
+		alert(error.data);
 	});
 	$http({
 		method: 'GET',
@@ -54,32 +55,32 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 		for (i = 0; i < _len; i++) {
 			//debugger
 			post = success.data[i];
-			$scope.sessions.push({'SessionId':post.SessionId,'Name':post.Name,'Date':post.Date});
+			$scope.sessions.push({'SessionId':post.SessionId,'SessionName':post.SessionName,'Date':post.date});
 		}
 	},function (error){
-		alert(error);
+		alert(error.data);
 	});
-	$scope.addItem = function () {
-		var Batch;
-		var BatchId = $scope.addbatch;
-		let SessionName = $scope.addname;
-		if (!BatchId||!SessionName){alert("Please fill all the details");return;} 
-		angular.forEach($scope.sessions, function(item) {
-			if( item.BatchId.indexOf(BatchId)==0){
-				Batch=item.Batch;
-			}
+	$scope.addSession = function () {
+		var date = $scope.adddate;
+		var SessionName = $scope.addname;
+		if (!date||!SessionName||$scope.attendees.length==0){alert("Please fill all the details");return;} 
+		var Attendeeslist = [];
+		angular.forEach($scope.attendees, function(item) {
+			Attendeeslist.push(parseInt(item.StudentId));	
 		});
+		var Attendeeslistjson=JSON.stringify(Attendeeslist);
 		if($scope.editindex==-1){
-			var dataString = '&BatchId='+ BatchId + '&Name='+ SessionName;
+			var dataString = '&date='+ date + '&SessionName='+ SessionName+ '&Attendees='+ Attendeeslistjson;
 			$http({
 				type: "GET",
-				url: "util/session.php?action=add"+dataString
+				url: "utils/session.php?action=add"+dataString
 			}).then(function(result){
-				BatchId=parseInt(result.data);
-				nitem={'BatchId':BatchId,'Name':SessionName,'Batch':Batch, 'SessionId':SessionId};
+				SessionId=parseInt(result.data);
+				nitem={'SessionId':SessionId,'SessionName':SessionName,'Date':date};
 				$scope.sessions.push(nitem);
+				alert("Session added successfully");
 			},function (error){
-				alert(error);
+				alert(error.data);
 			});
 		}
 		else
@@ -88,18 +89,24 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 			var dataString = '&BatchId='+ BatchId + '&Name='+ SessionName + '&SessionId='+ $scope.sessions[editindex].SessionId;
 			$http({
 				type: "GET",
-				url: "util/session.php?action=update"+dataString
+				url: "utils/session.php?action=update"+dataString
 			}).then(function(result){
 				$scope.students[editindex].Name=SessionName;
 				$scope.students[editindex].BatchId=$BatchId;
 				$scope.students[editindex].Batch=Batch;
 				},function (error){
-					alert(error);
+					alert(error.data);
 				});
 		}
 		$scope.addbatch="";
 		$scope.addname="";
 		$scope.editindex=-1;
+		angular.forEach($scope.attendees, function(item) {
+			$scope.students.push(item);
+		});
+		$scope.attendees=[];
+		$scope.adddate=today;
+		$("#sessiondate").datepicker('setDate', today);
 	}
 	$scope.removeItem = function (x) {
 		var index = $scope.sessions.indexOf(x);
@@ -107,12 +114,12 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 			var dataString = '&SessionId='+ $scope.sessions[index].SessionId;			
 			$http({
 				type: "GET",
-				url: "util/session.php?action=remove"+dataString
+				url: "utils/session.php?action=remove"+dataString
 			}).then(function(result){
 				$scope.sessions.splice(index, 1);
 			},
 			function (error){
-				alert(error);
+				alert(error.data);
 			});
 		}
     }
@@ -133,6 +140,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 		else
 			$scope.IsVisible = true;
 	}
+	//to add attendance from batch dropdown
 	$scope.addBatchAttendance = function(){
 		angular.forEach($scope.students, function(item) {
 			if($scope.attendees.indexOf(item)==-1)
@@ -148,15 +156,54 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 			$scope.students.splice(index, 1);
 		});
 	}
+	//to add attendance from other list.
 	$scope.addToAttendees = function(x){
 		var index = $scope.students.indexOf(x);
 		$scope.students.splice(index, 1);
 		$scope.attendees.push(x);
 	}
+	//to remove from attendance list
 	$scope.removeAttendance = function(x){
 		var index = $scope.attendees.indexOf(x);
 		$scope.attendees.splice(index, 1);
 		$scope.students.push(x);
 		
+	}
+	//to get the details of a session
+	$scope.getsession = function(x){
+		$scope.sessionattendees=[];
+		$scope.SessionDetailName=x.SessionName;
+		$scope.SessionDetailDate=x.Date;
+		var SessionId=x.SessionId;
+		var dataString = '&SessionId='+ SessionId;
+		$http({
+			method: 'GET',
+			url: 'utils/session.php?action=getSessionAttendees'+ dataString
+		}).then(function (success){
+			var _len = success.data.length;
+			var  post, i;
+			for (i = 0; i < _len; i++) {
+				//debugger
+				post = success.data[i];
+				$scope.sessionattendees.push({'StudentId':post.StudentId,'SessionId':SessionId,'BatchId':post.BatchId,'Batch':post.Batch,'Name':post.Name});
+			}
+		},function (error){
+			alert(error.data);
+		});		
+	}
+	//to remove the attendance of one student from view list.
+	$scope.removeStudentAttendance = function(x){
+		var StudentId=x.StudentId;
+		var SessionId=x.SessionId;
+		var dataString = '&SessionId='+ SessionId+'&StudentId='+ StudentId;
+		$http({
+			method: 'GET',
+			url: 'utils/session.php?action=removeStudentAttendance'+ dataString
+		}).then(function(result){
+				var index = $scope.sessionattendees.indexOf(x);
+				$scope.sessionattendees.splice(index, 1);
+		},function (error){
+			alert(error.data);
+		});
 	}
 });	
