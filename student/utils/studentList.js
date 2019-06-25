@@ -38,15 +38,18 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 		var Email = $scope.addemail;
 		var PhoneNo = $scope.addphone;
 		var Fees = $scope.addfees;
-		if (!BatchId||!Studentname){alert("Please fill all the details");return;} 
+
+		if(!Email){Emial="";}
+		if(!PhoneNo){PhoneNo="";}
+
+		if (!BatchId||!Studentname||!Fees){alert("Please fill all the details");return;} 
 		angular.forEach($scope.batches, function(item) {
 			if( item.BatchId.indexOf(BatchId)==0){
 				Batch=item.Batch;
 			}
 		});
 		if($scope.editindex==-1){
-			const newLocal = '&BatchId=' + BatchId + '&Name=' + Studentname + '&Email=' + Email + '&PhoneNo=' + PhoneNo + '&Fees=' + Fees;
-			var dataString = newLocal;
+			var dataString = '&BatchId=' + BatchId + '&Name=' + Studentname + '&Email=' + Email + '&PhoneNo=' + PhoneNo + '&Fees=' + Fees;
 			$http({
 				method: 'GET',
 				url: "utils/student.php?action=add"+dataString
@@ -140,7 +143,6 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 
 	$scope.removeStudentAttendance = function(x){
 		var StudentId=x.StudentId;
-		//console.log(x);
 		var SessionId=x.SessionId;
 		var dataString = '&SessionId='+ SessionId + '&StudentId='+ StudentId;
 		$http({
