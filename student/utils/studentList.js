@@ -39,7 +39,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 		var PhoneNo = $scope.addphone;
 		var Fees = $scope.addfees;
 
-		if(!Email){Emial="";}
+		if(!Email){Email="";}
 		if(!PhoneNo){PhoneNo="";}
 
 		if (!BatchId||!Studentname||!Fees){alert("Please fill all the details");return;} 
