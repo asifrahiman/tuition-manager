@@ -23,7 +23,7 @@
 					$sel = mysqli_query($con,"SELECT *,batches.Batch as Batch FROM `students` , `batches` where students.BatchId=batches.BatchId");
 					$data = array();
 					while ($row = mysqli_fetch_array($sel)) {
-						$data[] = array("BatchId"=>$row['BatchId'],"StudentId"=>$row['StudentId'],"Name"=>$row['Name'],"Batch"=>$row['Batch'], "Email"=>$row['Email'], "PhoneNo"=>$row['PhoneNo'], "Fees"=>$row['Fees']);
+						$data[] = array("BatchId"=>$row['BatchId'],"StudentId"=>$row['StudentId'],"Name"=>$row['Name'],"Batch"=>$row['Batch'], "Email"=>$row['Email'], "PhoneNo"=>$row['PhoneNo'], "Fees"=>$row['Fees'], "PaidSessions"=>$row['PaidSessions']);
 					}
 					echo json_encode($data);
 					break;
@@ -82,7 +82,18 @@
 						 echo("success");
 					 }
 					break;
-						
+
+		case "getPaidSessions":
+					 $PaidSessions = $_GET['PaidSessions'];
+					 $StudentId=$_GET['StudentId'];
+					 if (!mysqli_query($con,"UPDATE `student` SET `paidsession` = `paidsession` + $PaidSessions WHERE `StudentId`=$StudentId"))
+					 {
+						echo("Error description: " . mysqli_error($con));
+						header("HTTP/1.0 500 Internal Server Error");
+						die;
+					 }
+					echo "success";
+					break;
 						
 		default:
 					echo "An error occured";

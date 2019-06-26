@@ -12,7 +12,8 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 		for (i = 0; i < _len; i++) {
 			//debugger
 			post = success.data[i];
-			$scope.students.push({'StudentId':post.StudentId,'BatchId':post.BatchId,'Batch':post.Batch,'Name':post.Name, 'Email':post.Email, 'PhoneNo':post.PhoneNo, 'Fees':post.Fees});
+			$scope.students.push({'StudentId':post.StudentId,'BatchId':post.BatchId,'Batch':post.Batch,
+			'Name':post.Name, 'Email':post.Email, 'PhoneNo':post.PhoneNo, 'Fees':post.Fees, 'PaidSessions':post.PaidSessions});
 		}
 	},function (error){
 		alert(error.data);
@@ -64,7 +65,8 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 		else
 		{
 			var editindex=$scope.editindex;
-			var dataString = '&BatchId='+ BatchId + '&Name='+ Studentname + '&StudentId='+ $scope.students[editindex].StudentId + '&Email='+ Email + '&PhoneNo='+ PhoneNo + '&Fees='+ Fees;
+			var dataString = '&BatchId='+ BatchId + '&Name='+ Studentname + '&StudentId='+ $scope.students[editindex].StudentId + 
+			'&Email='+ Email + '&PhoneNo='+ PhoneNo + '&Fees='+ Fees;
 			
 			$http({
 				method: 'GET',
@@ -119,11 +121,10 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 		$scope.StudentDetailEmail = x.Email;
 		$scope.StudentDetailPhone = x.PhoneNo;
 		$scope.StudentDetailFees = x.Fees;
-		$scope.StudentDetailUnpaid="unpaid";
+		$scope.StudentDetailUnpaid=0;
 
 		var index = $scope.students.indexOf(x);
 		var StudentId = $scope.students[index].StudentId;
-
 		var dataString = '&StudentId='+ StudentId;
 		$http({
 			method: 'GET',
@@ -135,7 +136,31 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 				//debugger
 				post = success.data[i];
 				$scope.studentSessions.push({'SessionId':post.SessionId, 'SessionName':post.SessionName,'Date':post.Date, 'StudentId':StudentId});
-			}		
+			}
+
+			Classes = $scope.studentSessions.length;
+			Paid = x.PaidSessions
+			$scope.StudentDetailUnpaid = (Classes-Paid);
+			//console.log(Classes);
+			
+		},function (error){
+			alert(error.data);
+		});
+	}
+
+	$scope.payAmount = function(){
+
+		StudentId=$scope.StudentDetailId;
+		Fees = $scope.StudentDetailFees;
+		amount = $scope.PaidAmount;
+		PaidSessions = amount/Fees.toFixed(2);
+		var dataString = '&StudentId='+ StudentId + '&PaidSessions' + PaidSessions;
+		$http({
+			method: 'GET',
+			url: "utils/student.php?action=getPaidSessions"+dataString
+		}).then(function (success){
+			$scope.StudentDetailUnpaid=$scope.StudentDetailUnpaid-PaidSessions;
+			//console.log($scope.StudentDetailUnpaid);
 		},function (error){
 			alert(error.data);
 		});
