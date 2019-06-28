@@ -3,7 +3,6 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 	$scope.students = [];
 	$scope.batches = [];
 	$scope.editindex=-1;
-	$scope.PaidAmount=0;
 	$scope.PaidSessions = 0.00;
 	
 	$http({
@@ -150,8 +149,8 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 			}
 
 			Classes = $scope.studentSessions.length;
-			Paid = x.PaidSessions
-			$scope.StudentDetailUnpaid = (Classes-Paid);
+			Paid = (x.PaidSessions);
+			$scope.StudentDetailUnpaid = (Classes-Paid).toFixed(2);
 			//console.log(Classes);
 			
 		},function (error){
@@ -167,9 +166,9 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 			method: 'GET',
 			url: "utils/student.php?action=pay"+dataString
 		}).then(function (success){
-			$scope.StudentDetailUnpaid=$scope.StudentDetailUnpaid-PaidSessions;
-			$scope.PaidAmount=0;
-			$scope.PaidSessions=0;
+			$scope.StudentDetailUnpaid=($scope.StudentDetailUnpaid-PaidSessions).toFixed(2);
+			$scope.PaidAmount='';
+			$scope.PaidSessions=0.00;
 		},function (error){
 			alert(error.data);
 		});
