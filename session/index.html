@@ -83,7 +83,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr ng-repeat="x in sessions| orderBy:['Date']| filter : sessionfilter"><td>  {{x.SessionName}} </td><td> {{x.Date}} </td><td><span data-toggle="modal" data-target="#ViewSession" ng-click="getsession(x)">view</span> | <span ng-click="editItem(x)">edit</span> | <span ng-click="removeItem(x)">clear</span></td></tr>
+                    <tr ng-repeat="x in sessions| orderBy:['Date']| filter : sessionfilter"><td>  {{x.SessionName}} </td><td> {{x.Date}} </td><td><span data-toggle="modal" data-target="#ViewSession" ng-click="getsession(x)">view</span> | <span data-toggle="modal" data-target="#EditAttendance" ng-click="editItem(x)">edit</span> | <span ng-click="removeItem(x)">clear</span></td></tr>
                   </tbody>
                 </table>
               </div>
@@ -205,6 +205,110 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-success" ng-click="addSession()">Add Session</button>
+					<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+  <div id="EditAttendance" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog" style="width:90%;max-width:90%" role="document">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Edit Session</h5>
+					<button class="close" type="button" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+					
+				</div>
+				<div class="modal-body">
+					<form class="d-sm-inline-block form-inline mr-auto my-2 mw-100 navbar-search">
+						<div class="input-group">
+						  <input type="text" class="form-control bg-light small" placeholder="Enter Name" ng-model="editname" aria-label="Search" aria-describedby="basic-addon2">
+						  <input type="text" id="editsessiondate" ng-model="editdate" class="form-control bg-light small" placeholder="Select date"/>
+						</div>
+					</form>
+					
+					<div class="card shadow mb-4">
+						<div class="card-header py-3">
+						  <h6 class="m-0 font-weight-bold text-primary">Edit Attendance</h6>
+						</div>
+						
+						<div class="card-body">
+							<form  class="d-sm-inline-block form-inline mr-auto my-2  mw-100 navbar-search">
+								<div class="input-group">
+								  <select ng-change="checkVal()" id = "TypeSelect" class="form-control small" ng-model="addbatch" aria-label="Search" aria-describedby="basic-addon2">
+									<option value="">Batch</option>
+									<option ng-repeat="x in batches|orderBy:'Batch'" value="{{x.BatchId}}">{{x.Batch}}</option>
+								  </select>
+								  <div class="input-group-append">
+									<button ng-click="editBatchAttendance()"  class="btn btn-primary" type="button">Add</button>
+								  </div>
+								</div>
+							</form>
+							<div class="table-responsive">
+								<table class="table table-bordered" width="100%" cellspacing="0">
+									<thead>
+										<tr>
+										<th>Student Id</th>
+										<th>Name</th>
+										<th>Action</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr ng-repeat="x in editattendees| orderBy:['Name']" ><td>  {{x.StudentId}} </td><td>  {{x.Name}} </td><td><span ng-click="editRemoveAttendance(x)">Remove</span></td></tr>
+									</tbody>
+								</table>
+							</div>
+							<span ng-click="ShowHide()" class="btn btn-secondary">Add Others</span>
+						</div>
+						
+					</div>
+					<div>
+						
+						<div ng-show = "IsVisible">
+							<div class="card shadow mb-4">
+								<div class="card-header py-3">
+								  <h6 class="m-0 font-weight-bold text-primary">Students</h6>
+								</div>
+								<div class="card-body">
+									<form class="d-sm-inline-block form-inline mr-auto my-2 mw-100 navbar-search">
+										<div class="input-group">
+											<input type="text" class="form-control bg-light small" placeholder="Filter student" ng-model="studentfilter" aria-label="Search" aria-describedby="basic-addon2">
+										</div>
+									</form>
+									<dir-pagination-controls
+									max-size="8"
+									direction-links="true"
+									boundary-links="true" >
+									</dir-pagination-controls>
+								  <div class="table-responsive">
+									<table class="table table-bordered" width="100%" cellspacing="0">
+									  <thead>
+										<tr>
+										  <th>S.ID</th>
+										  <th>Name</th>
+										  <th>Batch</th>
+										  <th>Action</th>
+										</tr>
+									  </thead>
+									  <tbody>
+										<tr dir-paginate="x in editstudents| orderBy:['Name']| filter : studentfilter |itemsPerPage:5"><td>  {{x.StudentId}} </td><td>  {{x.Name}} </td><td> {{x.Batch}} </td><td><span ng-click="editAddToAttendees(x)">Add To List</span></td></tr>
+									  </tbody>
+									</table>
+								  </div>
+								  <dir-pagination-controls
+									max-size="8"
+									direction-links="true"
+									boundary-links="true" >
+									</dir-pagination-controls>
+								</div>
+							  </div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-success" ng-click="editSession()">Edit Session</button>
 					<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
 				</div>
 			</div>

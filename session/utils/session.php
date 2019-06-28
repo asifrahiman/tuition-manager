@@ -29,16 +29,23 @@
 			break;
 		
 		case "update":
-			$BatchId=$_GET["BatchId"];
-			$Name=$_GET["Name"];
-			$StudentId=$_GET["StudentId"];
-			if (!mysqli_query($con,"UPDATE `sessions` SET  `BatchId`='$BatchId',`Name`='$Name' WHERE `StudentId`=$StudentId"))
+			$date=$_GET["date"];
+			$SessionName=$_GET["SessionName"];
+			$SessionId=$_GET["SessionId"];
+			$addedAttendees=json_decode($_GET["addedAttendees"], true);
+			$removedAttendees=json_decode($_GET["removedAttendees"], true);
+			if (!mysqli_query($con,"UPDATE `sessions` SET  `Date`='$date',`SessionName`='$SessionName' WHERE `SessionId`=$SessionId"))
 			 {
 				echo("Error description: " . mysqli_error($con));
 				header("HTTP/1.0 500 Internal Server Error");
 				die;
 			 }
-			echo "success";
+			foreach ($addedAttendees as $Attendee){
+				mysqli_query($con,"INSERT INTO attendance (SessionId , StudentId)VALUES ('$SessionId','$Attendee')");
+			} 
+			foreach ($removedAttendees as $Attendee){
+				mysqli_query($con,"DELETE FROM attendance where SessionId=$SessionId and `StudentId` = $Attendee");
+			} 
 			break;
 		
 		case "remove":

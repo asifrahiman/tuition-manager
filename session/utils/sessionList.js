@@ -1,6 +1,10 @@
 var app = angular.module("Sessionlist", ['angularUtils.directives.dirPagination']); 
 app.controller("myCtrl", function($scope, $filter,$http) {
 	$scope.students = [];
+	$scope.editattendees = [];
+	$scope.editattendeesoriginal = [];
+	$scope.editstudents = [];
+	$scope.editstudentsoriginal = [];
 	$scope.sessions = [];
 	$scope.batches = [];
 	$scope.attendees = [];
@@ -29,6 +33,7 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 			post = success.data[i];
 			$scope.students.push({'StudentId':post.StudentId,'BatchId':post.BatchId,'Batch':post.Batch,'Name':post.Name});
 		}
+		$scope.editstudentsoriginal = angular.copy($scope.students);
 	},function (error){
 		alert(error.data);
 	});
@@ -69,44 +74,70 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 			Attendeeslist.push(parseInt(item.StudentId));	
 		});
 		var Attendeeslistjson=JSON.stringify(Attendeeslist);
-		if($scope.editindex==-1){
-			var dataString = '&date='+ date + '&SessionName='+ SessionName+ '&Attendees='+ Attendeeslistjson;
-			$http({
-				type: "GET",
-				url: "utils/session.php?action=add"+dataString
-			}).then(function(result){
-				SessionId=parseInt(result.data);
-				nitem={'SessionId':SessionId,'SessionName':SessionName,'Date':date};
-				$scope.sessions.push(nitem);
-				alert("Session added successfully");
-			},function (error){
-				alert(error.data);
-			});
-		}
-		else
-		{
-			var editindex=$scope.editindex;
-			var dataString = '&BatchId='+ BatchId + '&Name='+ SessionName + '&SessionId='+ $scope.sessions[editindex].SessionId;
-			$http({
-				type: "GET",
-				url: "utils/session.php?action=update"+dataString
-			}).then(function(result){
-				$scope.students[editindex].Name=SessionName;
-				$scope.students[editindex].BatchId=$BatchId;
-				$scope.students[editindex].Batch=Batch;
-				},function (error){
-					alert(error.data);
-				});
-		}
-		$scope.addbatch="";
+		var dataString = '&date='+ date + '&SessionName='+ SessionName+ '&Attendees='+ Attendeeslistjson;
+		$http({
+			type: "GET",
+			url: "utils/session.php?action=add"+dataString
+		}).then(function(result){
+			SessionId=parseInt(result.data);
+			nitem={'SessionId':SessionId,'SessionName':SessionName,'Date':date};
+			$scope.sessions.push(nitem);
+			alert("Session added successfully");
+		},function (error){
+			alert(error.data);
+		});
 		$scope.addname="";
-		$scope.editindex=-1;
 		angular.forEach($scope.attendees, function(item) {
 			$scope.students.push(item);
 		});
 		$scope.attendees=[];
 		$scope.adddate=today;
 		$("#sessiondate").datepicker('setDate', today);
+	}
+	$scope.editSession = function () {
+		var editindex=$scope.editindex;
+		var date = $scope.editdate;
+		var SessionName = $scope.editname;
+		var SessionId = $scope.editSessionId;
+		var addedAttendee = [];
+		var removedAttendee = [];
+		if (!date||!SessionName||$scope.editattendees.length==0){alert("Please fill all the details");return;} 
+		angular.forEach($scope.editattendeesoriginal, function(originalattendee) {
+			var found=false;
+			angular.forEach($scope.editattendees, function(attendee) {
+				if( originalattendee.StudentId==attendee.StudentId){
+					found=true;
+				}
+			});	
+			if(found==false){
+				removedAttendee.push(parseInt(originalattendee.StudentId));
+			}
+		});
+		angular.forEach($scope.editattendees, function(attendee) {
+			var found=false;
+			angular.forEach($scope.editattendeesoriginal, function(originalattendee) {
+				if( originalattendee.StudentId==attendee.StudentId){
+					found=true;
+				}
+			});	
+			if(found==false){
+				addedAttendee.push(parseInt(attendee.StudentId));
+			}
+		});
+		var addedAttendeeslistjson=JSON.stringify(addedAttendee);
+		var removedAttendeeslistjson=JSON.stringify(removedAttendee);
+		var dataString = '&date='+ date + '&SessionName='+ SessionName + '&SessionId='+ SessionId+ '&addedAttendees='+ addedAttendeeslistjson+ '&removedAttendees='+ removedAttendeeslistjson;
+		$http({
+			type: "GET",
+			url: "utils/session.php?action=update"+dataString
+		}).then(function(result){
+			$scope.sessions[editindex].SessionName=SessionName;
+			$scope.sessions[editindex].Date=date;
+			$scope.editattendeesoriginal = angular.copy($scope.editattendees);
+			alert("Session edited successfully");
+		},function (error){
+			alert(error.data);
+		});
 	}
 	$scope.removeItem = function (x) {
 		var index = $scope.sessions.indexOf(x);
@@ -124,15 +155,54 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 		}
     }
 	$scope.editItem = function (x) {
-		var index = $scope.students.indexOf(x);
-		$scope.addbatch=$scope.students[index].BatchId;
-		$scope.addname=$scope.students[index].Name;
+		var index = $scope.sessions.indexOf(x);
+		$scope.editSessionId=$scope.sessions[index].SessionId;
+		$scope.editname=$scope.sessions[index].SessionName;
+		$scope.editdate=$scope.sessions[index].Date;
 		$scope.editindex=index;
+		$scope.IsVisible = false;
+		$scope.editstudents = angular.copy($scope.editstudentsoriginal);
+		var dataString = '&SessionId='+ $scope.editSessionId;
+		$scope.editattendees=[];
+		var editstudentstudentid=[];
+		$http({
+			method: 'GET',
+			url: 'utils/session.php?action=getSessionAttendees'+ dataString
+		}).then(function (success){
+			var _len = success.data.length;
+			var  post, i;
+			for (i = 0; i < _len; i++) {
+				//debugger
+				post = success.data[i];
+				editstudentstudentid.push(post.StudentId);
+				angular.forEach(editstudentstudentid, function(studentid) {
+					angular.forEach($scope.editstudents, function(item) {
+						if( item.StudentId==studentid){
+							$scope.editattendees.push(item);
+						}
+					});	
+				});
+				angular.forEach($scope.editattendees, function(item) {
+					var index = $scope.editstudents.indexOf(item);
+					console.log(index)
+					if(index>-1)
+					$scope.editstudents.splice(index, 1);
+				});
+			}
+			$scope.editattendeesoriginal = angular.copy($scope.editattendees);
+		},function (error){
+			alert(error.data);
+		});
+		$("#editsessiondate").datepicker('setDate', $scope.editdate);
     }
 	$('#sessiondate').datepicker({
 		autoclose: true,  
 		format: "yyyy-mm-dd"
-	}).datepicker('setDate', $scope.adddate).on('changeDate', function (ev) {$scope.adddate = $("#sessiondate").val();$scope.$apply();});
+	}).datepicker('setDate', $scope.adddate).on('changeDate', function (ev) {$scope.adddate = $("#sessiondate").val();});
+	$('#editsessiondate').datepicker({
+		autoclose: true,  
+		format: "yyyy-mm-dd"
+	}).datepicker('setDate', $scope.adddate).on('changeDate', function (ev) {$scope.editdate = $("#editsessiondate").val();});
 	$scope.IsVisible = false;
 	$scope.ShowHide = function(){
 		if($scope.IsVisible==true)
@@ -205,5 +275,33 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 		},function (error){
 			alert(error.data);
 		});
+	}
+	//to add attendance from batch dropdown for edit
+	$scope.editBatchAttendance = function(){
+		angular.forEach($scope.editstudents, function(item) {
+			if($scope.editattendees.indexOf(item)==-1)
+				if( item.BatchId==$scope.addbatch){
+					$scope.editattendees.push(item);
+				}
+		});
+		angular.forEach($scope.editattendees, function(item) {
+			var index = $scope.editstudents.indexOf(item);
+			console.log(index)
+			if(index>-1)
+			$scope.editstudents.splice(index, 1);
+		});
+	}
+	//to add attendance from other list for edit
+	$scope.editAddToAttendees = function(x){
+		var index = $scope.editstudents.indexOf(x);
+		$scope.editstudents.splice(index, 1);
+		$scope.editattendees.push(x);
+	}
+	//to remove from attendance list  for edit
+	$scope.editRemoveAttendance = function(x){
+		var index = $scope.editattendees.indexOf(x);
+		$scope.editattendees.splice(index, 1);
+		$scope.editstudents.push(x);
+		
 	}
 });	
