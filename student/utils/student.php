@@ -46,7 +46,7 @@
 						
 		case "remove":
 						$StudentId=$_GET["StudentId"];
-						if (!mysqli_query($con,"DELETE FROM `students` WHERE `StudentId` = $StudentId"))
+						if (!mysqli_multi_query($con,"DELETE FROM `students` WHERE `StudentId` = $StudentId; DELETE FROM attendance where `StudentId` = $StudentId"))
 						{
 							echo("Error description: " . mysqli_error($con));
 							header("HTTP/1.0 500 Internal Server Error");
@@ -83,10 +83,10 @@
 					 }
 					break;
 
-		case "getPaidSessions":
+		case "pay":
 					 $PaidSessions = $_GET['PaidSessions'];
 					 $StudentId=$_GET['StudentId'];
-					 if (!mysqli_query($con,"UPDATE `student` SET `paidsession` = `paidsession` + $PaidSessions WHERE `StudentId`=$StudentId"))
+					 if (!mysqli_query($con,"UPDATE `students` SET `PaidSessions` = `PaidSessions` + '$PaidSessions' where `StudentId` = $StudentId"))
 					 {
 						echo("Error description: " . mysqli_error($con));
 						header("HTTP/1.0 500 Internal Server Error");

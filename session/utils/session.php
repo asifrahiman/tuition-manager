@@ -43,8 +43,13 @@
 		
 		case "remove":
 			$SessionId=$_GET['SessionId'];
-			mysqli_query($con,"DELETE FROM `sessions` WHERE `SessionId` = $SessionId");
-			mysqli_query($con,"DELETE FROM attendance WHERE `SessionId` =  $SessionId");
+			if (!mysqli_multi_query($con,"DELETE FROM `sessions` WHERE `SessionId` = $SessionId;DELETE FROM attendance WHERE `SessionId` =  $SessionId"))
+			{
+				echo("Error description: " . mysqli_error($con));
+				header("HTTP/1.0 500 Internal Server Error");
+				die;
+			 }
+			echo "success";
 			break;
 		
 		case "getSessionAttendees":

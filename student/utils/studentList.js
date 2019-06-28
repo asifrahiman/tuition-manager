@@ -3,6 +3,9 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 	$scope.students = [];
 	$scope.batches = [];
 	$scope.editindex=-1;
+	$scope.PaidAmount=0;
+	$scope.PaidSessions = 0.00;
+	
 	$http({
 		method: 'GET',
 		url: 'utils/student.php?action=get'
@@ -39,10 +42,18 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 		var Email = $scope.addemail;
 		var PhoneNo = $scope.addphone;
 		var Fees = $scope.addfees;
-
+		var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+		var phoneformat = /^\d{10}$/;
 		if(!Email){Email="";}
 		if(!PhoneNo){PhoneNo="";}
-
+		if(Email!=""&&!Email.match(mailformat)){
+			alert('Please enter a valid email address');
+			return;
+		}
+		if(PhoneNo!=""&&!PhoneNo.match(phoneformat)){
+			alert('Please enter a valid phone number');
+			return;
+		}
 		if (!BatchId||!Studentname||!Fees){alert("Please fill all the details");return;} 
 		angular.forEach($scope.batches, function(item) {
 			if( item.BatchId.indexOf(BatchId)==0){
@@ -149,21 +160,23 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 	}
 
 	$scope.payAmount = function(){
-
 		StudentId=$scope.StudentDetailId;
-		Fees = $scope.StudentDetailFees;
-		amount = $scope.PaidAmount;
-		PaidSessions = amount/Fees.toFixed(2);
-		var dataString = '&StudentId='+ StudentId + '&PaidSessions' + PaidSessions;
+		PaidSessions=$scope.PaidSessions;
+		var dataString = '&StudentId='+ StudentId + '&PaidSessions=' + PaidSessions;
 		$http({
 			method: 'GET',
-			url: "utils/student.php?action=getPaidSessions"+dataString
+			url: "utils/student.php?action=pay"+dataString
 		}).then(function (success){
 			$scope.StudentDetailUnpaid=$scope.StudentDetailUnpaid-PaidSessions;
-			//console.log($scope.StudentDetailUnpaid);
+			$scope.PaidAmount=0;
+			$scope.PaidSessions=0;
 		},function (error){
 			alert(error.data);
 		});
+	}
+
+	$scope.viewPaidSession = function(){
+		$scope.PaidSessions = ($scope.PaidAmount/$scope.StudentDetailFees).toFixed(2);
 	}
 
 	$scope.removeStudentAttendance = function(x){
@@ -180,5 +193,5 @@ app.controller("myCtrl", function($scope, $filter,$http) {
 			alert(error.data);
 		});
 	}
-	
 });	
+	

@@ -146,6 +146,18 @@
 					<p>Session fees : {{StudentDetailFees}}</p>
 					<p>Unpaid Sessions : {{StudentDetailUnpaid}}</p>
 					<p>Amount to Pay : {{StudentDetailUnpaid*StudentDetailFees}}</p>
+					<div class="row">
+						<p>Pay : </p>
+						<form class="d-sm-inline-block form-inline mb-2 my-0">
+							<div class="input-group">
+								<input type="text" class="form-control bg-light border-0 small" ng-model="PaidAmount" ng-change="viewPaidSession()" placeholder="Amount Paid" aria-describedby="basic-addon2">
+								<div class="input-group-append">
+									<button class="btn btn-primary" ng-click="payAmount()" type="button">pay</button>
+								</div>
+							</div>
+						</form>
+						<p>Paying for : {{PaidSessions}} </p>
+					</div> 
 					<div class="card shadow mb-4">
 						<div class="card-header py-3">
 						  <h6 class="m-0 font-weight-bold text-primary">Session Details</h6>
